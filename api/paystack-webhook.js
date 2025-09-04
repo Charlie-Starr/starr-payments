@@ -10,16 +10,25 @@ export default async function handler(req, res) {
   if (event.event === 'charge.success') {
     const coneId = event.data.metadata?.cone_id;
     const days = parseInt(event.data.metadata?.days || "7", 10);
+    const amountPaid = event.data.amount / 100; // kobo → naira
+
+    // Anti-cheat price check
+    const PRICE = { 7: 5000, 14: 10000, 21: 15000, 30: 20000 };
+    if (PRICE[days] !== amountPaid) {
+      return res.status(400).json({ error: 'Invalid payment: mismatch between amount and days' });
+    }
 
     if (!coneId) {
       return res.status(400).json({ error: 'No cone_id in metadata' });
     }
 
+    // Supabase client
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_KEY
     );
 
+    // Expiry date
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
 
@@ -39,13 +48,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ received: true });
-
-  // verify amount matches plan
-const amountPaid = event.data.amount / 100; // Paystack gives kobo
-const days = parseInt(event.data.metadata?.days || "0", 10);
-
-const PRICE = { 7: 5000, 14: 10000, 21: 15000, 30: 20000 };
-
-if (PRICE[days] !== amountPaid) {
-  return res.status(400).json({ error: 'Invalid payment: mismatch between amount and days' });
 }
