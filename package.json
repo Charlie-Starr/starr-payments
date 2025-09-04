@@ -1,0 +1,12 @@
+{
+  "name": "starr-payments",
+  "version": "1.0.0",
+  "description": "Backend for Starr AI CONEID payments",
+  "main": "index.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7"
+  }
+}
