@@ -40,3 +40,12 @@ export default async function handler(req, res) {
 
   return res.status(200).json({ received: true });
 }
+// verify amount matches plan
+const amountPaid = event.data.amount / 100; // Paystack gives kobo
+const days = parseInt(event.data.metadata?.days || "0", 10);
+
+const PRICE = { 7: 5000, 14: 10000, 21: 15000, 30: 20000 };
+
+if (PRICE[days] !== amountPaid) {
+  return res.status(400).json({ error: 'Invalid payment: mismatch between amount and days' });
+}
