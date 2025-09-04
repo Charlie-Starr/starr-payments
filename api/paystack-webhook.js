@@ -39,8 +39,8 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ received: true });
-}
-// verify amount matches plan
+
+  // verify amount matches plan
 const amountPaid = event.data.amount / 100; // Paystack gives kobo
 const days = parseInt(event.data.metadata?.days || "0", 10);
 
